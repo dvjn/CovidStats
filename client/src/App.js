@@ -1,6 +1,7 @@
 import React from "react";
-import { Container, Card, CardBody, CardTitle } from "shards-react";
+import { Container, Col } from "shards-react";
 import TrendsGraph from "./components/TrendsGraph";
+import TopCountriesCharts from "./components/TopCountriesCharts";
 import "./App.css";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,13 +11,11 @@ const App = () => {
   return (
     <div className="App">
       <Container>
-        <h2>Go Corona, Corona Go!</h2>
-        <Card>
-          <CardBody>
-            <CardTitle>Trends</CardTitle>
-            <TrendsGraph />
-          </CardBody>
-        </Card>
+        <h2 className="col-ns">
+          Go Corona <span role="img">👋</span>
+        </h2>
+        <TopCountriesCharts />
+        <TrendsGraph />
       </Container>
     </div>
   );

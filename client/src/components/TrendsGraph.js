@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TableTooltip } from "@nivo/tooltip";
 import { ResponsiveLine } from "@nivo/line";
+import CollapseLoader from "./CollapseLoader";
 import useFormInput from "../hooks/useFormInput";
 import {
   InputGroup,
@@ -8,13 +9,15 @@ import {
   InputGroupText,
   InputGroupAddon,
   Row,
+  Col,
   ButtonGroup,
   Button,
-  Alert,
+  Card,
+  CardBody,
 } from "shards-react";
 import globals from "../globals";
 
-const { search, params, host } = globals;
+const { formatNumber, search, params, host } = globals;
 
 const parseDataForChart = result =>
   result.index
@@ -76,104 +79,118 @@ const TrendsGraph = () => {
   }, [country.value]);
 
   return (
-    <>
-      <Row>
-        <InputGroup size="sm" className="col">
-          <InputGroupAddon type="prepend">
-            <InputGroupText>Country</InputGroupText>
-          </InputGroupAddon>
-          <FormSelect id="country-select" {...country.bind}>
-            {countries.map(country => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
-          </FormSelect>
-        </InputGroup>
-        <InputGroup size="sm" className="col">
-          <InputGroupAddon type="prepend">
-            <InputGroupText>State</InputGroupText>
-          </InputGroupAddon>
-          <FormSelect id="state-select" {...state.bind}>
-            {states.map(state => (
-              <option key={state} value={state}>
-                {state}
-              </option>
-            ))}
-          </FormSelect>
-        </InputGroup>
-        <Button onClick={loadGraph} size="sm" className="col-ns">
-          Show Trends
-        </Button>
-      </Row>
-      <Row className="param-selector-row">
-        <ButtonGroup size="sm">
-          {params.map(param => (
-            <Button
-              key={param.name}
-              onClick={() => handleParamChange(param.name)}
-              theme={selectedParams[param.name] ? "primary" : "light"}>
-              {param.name}
-            </Button>
-          ))}
-        </ButtonGroup>
-      </Row>
-      <Row style={{ height: "500px" }}>
-        <ResponsiveLine
-          data={trendData.filter(d => selectedParams[d.id])}
-          margin={{ top: 12, bottom: 48, left: 72, right: 24 }}
-          colors={{ datum: "color" }}
-          xScale={{
-            type: "time",
-            format: "%m/%d/%y",
-            precision: "day",
-          }}
-          xFormat="time:%b %d"
-          curve="monotoneX"
-          lineWidth={5}
-          axisBottom={{
-            format: "%b %d",
-          }}
-          sliceTooltip={({ slice }) => (
-            <TableTooltip
-              title={slice.points[0].data.xFormatted}
-              rows={slice.points.map(point => [
-                <span
-                  style={{
-                    display: "block",
-                    width: "12px",
-                    height: "12px",
-                    borderRadius: "12px",
-                    background: point.serieColor,
-                  }}
-                />,
-                point.serieId,
-                <strong key="value">{point.data["yFormatted"]}</strong>,
-              ])}
-            />
-          )}
-          enableGridX={false}
-          enableGridY={true}
-          enableSlices="x"
-          enablePoints={false}
-          useMesh={true}
-          enableArea={true}
-          legends={[
-            {
-              anchor: "top-left",
-              direction: "column",
-              itemWidth: 80,
-              itemHeight: 20,
-              itemOpacity: 0.75,
-              symbolShape: "circle",
-              padding: 20,
-              itemBackground: "#ffffff",
-              onClick: p => handleParamChange(p.label),
-            },
-          ]}
-        />
-      </Row>
-    </>
+    <Row>
+      <Col>
+        <Card>
+          <CardBody>
+            <h4>
+              Trends <span role="img">📈</span>
+            </h4>
+            <Row>
+              <InputGroup size="sm" className="col">
+                <InputGroupAddon type="prepend">
+                  <InputGroupText>Country</InputGroupText>
+                </InputGroupAddon>
+                <FormSelect id="country-select" {...country.bind}>
+                  {countries.map(country => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </FormSelect>
+              </InputGroup>
+              <InputGroup size="sm" className="col">
+                <InputGroupAddon type="prepend">
+                  <InputGroupText>State</InputGroupText>
+                </InputGroupAddon>
+                <FormSelect id="state-select" {...state.bind}>
+                  {states.map(state => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </FormSelect>
+              </InputGroup>
+              <div className="col-ns">
+                <Button onClick={loadGraph} size="sm">
+                  Show Trends
+                </Button>
+              </div>
+            </Row>
+            <Row
+              className="center-container"
+              style={{ padding: "4px", paddingTop: "12px" }}>
+              <ButtonGroup size="sm">
+                {params.map(param => (
+                  <Button
+                    key={param.name}
+                    onClick={() => handleParamChange(param.name)}
+                    theme={selectedParams[param.name] ? "dark" : "light"}>
+                    {param.name}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            </Row>
+            <Row style={{ height: "500px" }}>
+              <ResponsiveLine
+                data={trendData.filter(d => selectedParams[d.id])}
+                margin={{ top: 12, bottom: 48, left: 72, right: 24 }}
+                colors={{ datum: "color" }}
+                xScale={{
+                  type: "time",
+                  format: "%m/%d/%y",
+                  precision: "day",
+                }}
+                xFormat="time:%b %d"
+                yFormat={formatNumber}
+                curve="monotoneX"
+                lineWidth={5}
+                axisBottom={{
+                  format: "%b %d",
+                }}
+                sliceTooltip={({ slice }) => (
+                  <TableTooltip
+                    title={slice.points[0].data.xFormatted}
+                    rows={slice.points.map(point => [
+                      <span
+                        style={{
+                          display: "block",
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "12px",
+                          background: point.serieColor,
+                        }}
+                      />,
+                      point.serieId,
+                      <strong key="value">{point.data["yFormatted"]}</strong>,
+                    ])}
+                  />
+                )}
+                enableGridX={false}
+                enableGridY={true}
+                enableSlices="x"
+                enablePoints={false}
+                useMesh={true}
+                enableArea={true}
+                legends={[
+                  {
+                    anchor: "top-left",
+                    direction: "column",
+                    itemWidth: 80,
+                    itemHeight: 20,
+                    itemOpacity: 0.75,
+                    symbolShape: "circle",
+                    padding: 20,
+                    itemBackground: "#ffffff",
+                    onClick: p => handleParamChange(p.label),
+                  },
+                ]}
+              />
+            </Row>
+          </CardBody>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 

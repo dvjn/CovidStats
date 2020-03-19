@@ -6,7 +6,8 @@ const globals = {
       }
     }
   },
-  host: "https://covid19-stats.herokuapp.com",
+  // host: "https://covid19-stats.herokuapp.com",
+  host: "",
   params: [
     { name: "Confirmed", color: "#007bff" },
     { name: "Deaths", color: "#dc3545" },

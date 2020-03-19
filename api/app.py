@@ -6,15 +6,14 @@ from .data import covid_data, countries, states, params
 
 api = Blueprint('api', __name__)
 
-@api.route('/get_time_series/', methods=['GET'])
-def time_series_data():
-    country, state = request.args.get('country', 'All'), request.args.get('state', 'All')
-    dataformat = request.args.get('format', 'index')
-    return {
-            'country': country, 
-            'state': state, 
-            'data': covid_data.loc[(country, state, slice(None)), :].reset_index(level=['Country/Region','Province/State'], drop=True).to_dict(dataformat)
-        }
+@api.route('/get_data/', methods=['GET'])
+def get_data():
+    args = [
+        {'id':'Country/Region', 'req': request.args.get('country', False)}, 
+        {'id':'Province/State', 'req': request.args.get('state', False)}, 
+        {'id':'Parameter', 'req': request.args.get('parameter', False)}
+    ]
+    return covid_data.loc[tuple(arg['req'] if arg['req'] else slice(None) for arg in args), :].to_dict("split")
 
 @api.route('/get_countries/', methods=['GET'])
 def get_countries():

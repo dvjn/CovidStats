@@ -10,7 +10,7 @@ const App = () => {
   return (
     <div className="App">
       <Container>
-        <h2>COVID 19 - Statistics</h2>
+        <h2>Go Corona, Corona Go!</h2>
         <Card>
           <CardBody>
             <CardTitle>Trends</CardTitle>

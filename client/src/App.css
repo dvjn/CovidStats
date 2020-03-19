@@ -3,3 +3,14 @@
   min-height: 100vh;
   padding: 48px 12px;
 }
+
+.col-ns {
+  margin: 0 15px;
+}
+
+.param-selector-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 4px 4px 4px;
+}

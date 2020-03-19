@@ -10,27 +10,30 @@ import {
   Row,
   ButtonGroup,
   Button,
+  Alert,
 } from "shards-react";
 import globals from "../globals";
 
 const { search, params, host } = globals;
 
 const parseDataForChart = result =>
-  result.data.index.map((param, i) => ({
-    id: param,
-    color: search(param, params).color,
-    data: result.data.columns.map((column, j) => ({
-      x: column,
-      y: result.data.data[i][j],
-    })),
-  }));
+  result.index
+    .map(([country, state, param], i) => ({
+      id: param,
+      color: search(param, params).color,
+      data: result.columns.map((column, j) => ({
+        x: column,
+        y: result.data[i][j],
+      })),
+    }))
+    .reverse();
 
 const TrendsGraph = () => {
   const country = useFormInput("All");
   const state = useFormInput("All");
   const [selectedParams, setSelectedParams] = useState(() => {
     let initialParams = {};
-    params.map(param => (initialParams[param.name] = true));
+    params.forEach(param => (initialParams[param.name] = true));
     return initialParams;
   });
   const [countries, setCountries] = useState(["All"]);
@@ -45,12 +48,23 @@ const TrendsGraph = () => {
     });
   }, []);
 
+  const loadGraph = useCallback(() => {
+    fetch(
+      host + "/api/get_data/?country=" + country.value + "&state=" + state.value
+    )
+      .then(res => res.json())
+      .then(res => {
+        setTrendData(parseDataForChart(res));
+      });
+  }, [state.value, country.value]);
+
   useEffect(() => {
     fetch(host + "/api/get_countries")
       .then(res => res.json())
       .then(res => {
         setCountries(res);
       });
+    loadGraph();
   }, []);
 
   useEffect(() => {
@@ -60,20 +74,6 @@ const TrendsGraph = () => {
         setStates(res);
       });
   }, [country.value]);
-
-  useEffect(() => {
-    fetch(
-      host +
-        "/api/get_time_series?format=split&country=" +
-        country.value +
-        "&state=" +
-        state.value
-    )
-      .then(res => res.json())
-      .then(res => {
-        setTrendData(parseDataForChart(res));
-      });
-  }, [country.value, state.value]);
 
   return (
     <>
@@ -102,7 +102,12 @@ const TrendsGraph = () => {
             ))}
           </FormSelect>
         </InputGroup>
-        <ButtonGroup size="sm" className="col">
+        <Button onClick={loadGraph} size="sm" className="col-ns">
+          Show Trends
+        </Button>
+      </Row>
+      <Row className="param-selector-row">
+        <ButtonGroup size="sm">
           {params.map(param => (
             <Button
               key={param.name}
@@ -116,7 +121,7 @@ const TrendsGraph = () => {
       <Row style={{ height: "500px" }}>
         <ResponsiveLine
           data={trendData.filter(d => selectedParams[d.id])}
-          margin={{ top: 50, bottom: 50, left: 75, right: 50 }}
+          margin={{ top: 12, bottom: 48, left: 72, right: 24 }}
           colors={{ datum: "color" }}
           xScale={{
             type: "time",
@@ -138,6 +143,7 @@ const TrendsGraph = () => {
                     display: "block",
                     width: "12px",
                     height: "12px",
+                    borderRadius: "12px",
                     background: point.serieColor,
                   }}
                 />,
@@ -151,6 +157,7 @@ const TrendsGraph = () => {
           enableSlices="x"
           enablePoints={false}
           useMesh={true}
+          enableArea={true}
           legends={[
             {
               anchor: "top-left",
@@ -161,6 +168,7 @@ const TrendsGraph = () => {
               symbolShape: "circle",
               padding: 20,
               itemBackground: "#ffffff",
+              onClick: p => handleParamChange(p.label),
             },
           ]}
         />

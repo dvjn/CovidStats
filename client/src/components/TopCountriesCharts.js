@@ -66,12 +66,14 @@ const TopCountriesCharts = () => {
                           color,
                           fontSize: "0.5em",
                           marginRight: "8px",
-                        }}>
+                        }}
+                      >
                         +
                         {formatNumber(
                           topCountriesData[name]["All"][changeSpan[name]]
                         )}
                       </span>
+                      <br />
                       {formatNumber(topCountriesData[name]["All"].current)}
                     </h1>
                     <table>
@@ -85,7 +87,8 @@ const TopCountriesCharts = () => {
                               style={{
                                 paddingLeft: "12px",
                                 textAlign: "right",
-                              }}>
+                              }}
+                            >
                               <strong>{formatNumber(datum.current)}</strong>
                             </td>
                             <td
@@ -94,7 +97,8 @@ const TopCountriesCharts = () => {
                                 fontSize: "0.8em",
                                 paddingLeft: "12px",
                                 textAlign: "right",
-                              }}>
+                              }}
+                            >
                               <strong>
                                 +{formatNumber(datum[changeSpan[name]])}
                               </strong>
@@ -103,29 +107,14 @@ const TopCountriesCharts = () => {
                         );
                       })}
                     </table>
-                    {/*<div
-                      style={{
-                        paddingTop: "12px",
-                      }}
-                      className="center-container">
-                       <ButtonGroup size="sm">
-                        {changeSpans.map(([key, value]) => (
-                          <Button
-                            key={key}
-                            onClick={() => handleSpanSelect(name, key)}
-                            theme={changeSpan[name] == key ? "dark" : "light"}>
-                            {value}
-                          </Button>
-                        ))}
-                      </ButtonGroup>
-                    </div> */}
                     <InputGroup size="sm" style={{ paddingTop: "12px" }}>
                       <InputGroupAddon type="prepend">
                         <InputGroupText>Since</InputGroupText>
                       </InputGroupAddon>
                       <FormSelect
                         value={changeSpan[name]}
-                        onChange={e => handleSpanSelect(name, e.target.value)}>
+                        onChange={e => handleSpanSelect(name, e.target.value)}
+                      >
                         {changeSpans.map(([key, value]) => (
                           <option key={key} value={key}>
                             {value}
